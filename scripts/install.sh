@@ -30,9 +30,12 @@ sudo stow absl > /dev/null
 sudo apt install -y python3-pip
 sudo pip install rosdepc
 
-cd ~/carto_ws
+# if rosdep[c] init && rosdep[c] update failed
+# . fishros instead
 sudo rosdepc init
 rosdepc update
+
+cd ~/carto_ws
 rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
 catkin_make_isolated --install --use-ninja -j3
 
