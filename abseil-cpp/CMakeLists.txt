@@ -21,6 +21,8 @@
 # and then issuing `yum install cmake3` on the command line.
 cmake_minimum_required(VERSION 3.5)
 
+add_compile_options(-fPIC)
+# set(POSITION_INDEPENDENT_CODE True)
 # Compiler id for Apple Clang is now AppleClang.
 if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
