@@ -36,4 +36,4 @@ rosdepc update
 rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
 catkin_make_isolated --install --use-ninja -j3
 
-echo "~/carto_ws/installed_isolated/setup.bash" >> ~/.bashrc
+echo "~/carto_ws/install_isolated/setup.bash" >> ~/.bashrc
