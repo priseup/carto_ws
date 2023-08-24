@@ -6,6 +6,7 @@ set -x
 
 sudo apt update
 sudo apt install -y python3-wstool python3-rosdep ninja-build stow
+sudo apt install -y libgmock-dev
 
 ##### install abseil #############
 cd ~/carto_ws/abseil-cpp
