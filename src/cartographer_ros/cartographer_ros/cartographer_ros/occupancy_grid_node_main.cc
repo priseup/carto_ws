@@ -37,6 +37,8 @@
 #include "nav_msgs/OccupancyGrid.h"
 #include "ros/ros.h"
 
+DEFINE_bool(is_pure_localization, false,
+              "pure localization or not");
 DEFINE_double(resolution, 0.05,
               "Resolution of a grid cell in the published occupancy grid.");
 DEFINE_double(publish_period_sec, 1.0, "OccupancyGrid publishing period.");
@@ -56,7 +58,7 @@ using ::cartographer::mapping::SubmapId;
 
 class Node {
  public:
-  explicit Node(double resolution, double publish_period_sec);
+  explicit Node(double resolution, double publish_period_sec, bool is_pure_localization);
   ~Node() {}
 
   Node(const Node&) = delete;
@@ -68,6 +70,7 @@ class Node {
 
   ::ros::NodeHandle node_handle_;
   const double resolution_;
+  const bool is_pure_localization_;
 
   absl::Mutex mutex_;
   ::ros::ServiceClient client_ GUARDED_BY(mutex_);
@@ -79,8 +82,9 @@ class Node {
   ros::Time last_timestamp_;
 };
 
-Node::Node(const double resolution, const double publish_period_sec)
+Node::Node(const double resolution, const double publish_period_sec, bool is_pure_localization)
     : resolution_(resolution),
+    is_pure_localization_(is_pure_localization),
       client_(node_handle_.serviceClient<::cartographer_ros_msgs::SubmapQuery>(
           kSubmapQueryServiceName)),
       submap_list_subscriber_(node_handle_.subscribe(
@@ -97,6 +101,7 @@ Node::Node(const double resolution, const double publish_period_sec)
       occupancy_grid_publisher_timer_(
           node_handle_.createWallTimer(::ros::WallDuration(publish_period_sec),
                                        &Node::DrawAndPublish, this)) {}
+
 
 void Node::HandleSubmapList(
     const cartographer_ros_msgs::SubmapList::ConstPtr& msg) {
@@ -168,7 +173,8 @@ void Node::DrawAndPublish(const ::ros::WallTimerEvent& unused_timer_event) {
   auto painted_slices = PaintSubmapSlices(submap_slices_, resolution_);
   std::unique_ptr<nav_msgs::OccupancyGrid> msg_ptr = CreateOccupancyGridMsg(
       painted_slices, resolution_, last_frame_id_, last_timestamp_);
-  occupancy_grid_publisher_.publish(*msg_ptr);
+  if (!is_pure_localization_)
+    occupancy_grid_publisher_.publish(*msg_ptr);
 }
 
 }  // namespace
@@ -185,7 +191,7 @@ int main(int argc, char** argv) {
   ::ros::start();
 
   cartographer_ros::ScopedRosLogSink ros_log_sink;
-  ::cartographer_ros::Node node(FLAGS_resolution, FLAGS_publish_period_sec);
+  ::cartographer_ros::Node node(FLAGS_resolution, FLAGS_publish_period_sec, FLAGS_is_pure_localization);
 
   ::ros::spin();
   ::ros::shutdown();
