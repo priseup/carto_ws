@@ -2,7 +2,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find cartographer_ros)/configuration_files
-          -configuration_basename localization.lua
+          -configuration_basename scout_localization.lua
           -load_state_filename /home/huakong/data/0714_line_carto.pbstream"
       output="screen">
     <remap from="scan" to="/rslidar_scan" />
