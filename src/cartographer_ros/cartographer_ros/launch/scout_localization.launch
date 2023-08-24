@@ -6,6 +6,7 @@
           -load_state_filename /home/huakong/data/0714_line_carto.pbstream"
       output="screen">
     <remap from="scan" to="/rslidar_scan" />
+    <remap from="imu" to="/imu_raw">
   </node>
 
   <node name="cartographer_occupancy_grid_node" pkg="cartographer_ros"
