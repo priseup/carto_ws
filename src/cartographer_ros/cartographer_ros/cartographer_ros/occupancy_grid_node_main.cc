@@ -170,11 +170,12 @@ void Node::DrawAndPublish(const ::ros::WallTimerEvent& unused_timer_event) {
   if (submap_slices_.empty() || last_frame_id_.empty()) {
     return;
   }
+  if (is_pure_localization_)
+    return ;
   auto painted_slices = PaintSubmapSlices(submap_slices_, resolution_);
   std::unique_ptr<nav_msgs::OccupancyGrid> msg_ptr = CreateOccupancyGridMsg(
       painted_slices, resolution_, last_frame_id_, last_timestamp_);
-  if (!is_pure_localization_)
-    occupancy_grid_publisher_.publish(*msg_ptr);
+  occupancy_grid_publisher_.publish(*msg_ptr);
 }
 
 }  // namespace
